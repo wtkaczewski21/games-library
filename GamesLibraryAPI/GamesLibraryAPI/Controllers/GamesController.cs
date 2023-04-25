@@ -1,5 +1,6 @@
 ﻿using GamesLibraryAPI.Data;
 using GamesLibraryAPI.Models;
+using GamesLibraryAPI.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,24 +11,23 @@ namespace GamesLibraryAPI.Controllers
     [ApiController]
     public class GamesController : ControllerBase
     {
-        private readonly AppDbContext _context;
-
-        public GamesController(AppDbContext context)
+        private readonly IGameService _service;
+        public GamesController(IGameService service)
         {
-            _context = context;
+            _service = service;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllGames()
+        public async Task<ActionResult<List<Game>>> GetAllGames()
         {
-            var games = await _context.Games.ToListAsync();
+            var games = await _service.GetAllGames();
             return Ok(games);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetGameById(int id)
+        public async Task<ActionResult<Game>> GetGameById(int id)
         {
-            var game = await _context.Games.FindAsync(id);
+            var game = await _service.GetGameById(id);
             if (game is null)
                 return NotFound("Sorry, this game doesn't exist.");
 
@@ -35,38 +35,30 @@ namespace GamesLibraryAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddGame(Game game)
+        public async Task<ActionResult<Game>> AddGame(Game game)
         {
-            await _context.Games.AddAsync(game);
-            await _context.SaveChangesAsync();
+            await _service.AddGame(game);
             return Ok(game);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateGame(int id, Game game)
+        public async Task<ActionResult<Game>> UpdateGame(int id, Game game)
         {
-            var updatedGame = await _context.Games.FindAsync(id);
+            var updatedGame = await _service.UpdateGame(id, game);
             if (updatedGame is null)
                 return NotFound("Sorry, this game doesn't exist.");
 
-            updatedGame.Title = game.Title;
-            updatedGame.Category = game.Category;
-            updatedGame.ReleaseDate = game.ReleaseDate;
-
-            await _context.SaveChangesAsync();
             return Ok(updatedGame);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteGame(int id)
+        public async Task<ActionResult<List<Game>>> DeleteGame(int id)
         {
-            var game = await _context.Games.FindAsync(id);
+            var game = await _service.DeleteGame(id);
             if (game is null)
                 return NotFound("Sorry, this game doesn't exist.");
 
-            _context.Games.Remove(game);
-            await _context.SaveChangesAsync();
-            return Ok(_context.Games);
+            return Ok();
         }
     }
 }
