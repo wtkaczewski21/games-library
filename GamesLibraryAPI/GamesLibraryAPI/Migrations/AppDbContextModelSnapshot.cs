@@ -31,17 +31,42 @@ namespace GamesLibraryAPI.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Category")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Games");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Category = "RPG",
+                            ReleaseDate = new DateTime(2011, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Skyrim"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Category = "Strategy",
+                            ReleaseDate = new DateTime(2011, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Heroes"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Category = "Sport",
+                            ReleaseDate = new DateTime(2011, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "FIFA"
+                        });
                 });
 #pragma warning restore 612, 618
         }
